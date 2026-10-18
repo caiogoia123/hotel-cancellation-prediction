@@ -61,6 +61,25 @@ def barras_agrupadas(ax, tabela, titulo, destacar=()):
     ax.set_title(titulo)
 
 
+def barras_com_sinal(ax, valores, titulo):
+    """Barras horizontais que podem ser negativas: laranja quando o valor é positivo, azul quando é negativo."""
+    ax.barh([str(i) for i in valores.index], valores.values, height=0.5,
+            color=[LARANJA if v > 0 else AZUL for v in valores.values])
+    ax.axvline(0, color=TEXTO_SECUNDARIO, linewidth=1)
+    for i, v in enumerate(valores.values):
+        ax.annotate(f"{v:+.2f}".replace(".", ",").replace("-", "−"), (v, i),
+                    xytext=(3 if v >= 0 else -3, 0), textcoords="offset points",
+                    ha="left" if v >= 0 else "right", va="center", color=TEXTO, fontsize=9, bbox=FUNDO_ROTULO)
+    if not ax.yaxis_inverted():
+        ax.invert_yaxis()
+    menor, maior = min(valores.min(), 0), max(valores.max(), 0)
+    folga = (maior - menor) * 0.25
+    ax.set_xlim(menor - folga, maior + folga)
+    ax.grid(axis="x")
+    ax.grid(axis="y", visible=False)
+    ax.set_title(titulo)
+
+
 def barras_horizontais(ax, valores, titulo, formato=pct, media=None, nome_media="média geral"):
     """Uma barra horizontal por grupo, na ordem recebida, com o valor na ponta."""
     ax.barh([str(i) for i in valores.index], valores.values, height=0.5, color=AZUL)
