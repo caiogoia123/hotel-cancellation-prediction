@@ -3,8 +3,6 @@ numpy==2.4.6
 scikit-learn==1.9.1
 lightgbm==4.7.0
 matplotlib==3.11.2
-seaborn==0.13.2
-shap==0.51.0
 pyarrow==26.0.0
 jupyterlab==4.6.4
 ipykernel==7.4.0
