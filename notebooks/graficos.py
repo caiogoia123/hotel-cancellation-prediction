@@ -15,7 +15,7 @@ def aplicar_estilo():
         "axes.spines.top": False, "axes.spines.right": False, "axes.spines.left": False,
         "axes.edgecolor": GRADE, "axes.axisbelow": True,
         "axes.grid": True, "axes.grid.axis": "y", "grid.color": GRADE, "grid.linewidth": 0.8,
-        "axes.titlesize": 11, "axes.titleweight": "semibold", "axes.titlelocation": "left",
+        "axes.titlesize": 11, "axes.titleweight": "bold", "axes.titlelocation": "left",
         "text.color": TEXTO, "axes.labelcolor": TEXTO_SECUNDARIO,
         "xtick.color": TEXTO_SECUNDARIO, "ytick.color": TEXTO_SECUNDARIO, "ytick.left": False,
     })
