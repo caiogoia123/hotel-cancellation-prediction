@@ -10,11 +10,30 @@ On the test period (arrivals from May to August 2017, never used to train or cho
 
 - Among the 10% of bookings the model flags as riskiest, **67% to 73% are actually canceled**. Picking at random gives 35%, and a simple segment × lead time table gives 54%.
 - ROC-AUC of **0.765** (0.745 for the conservative version).
+- Accuracy of **72.5%**, with 62% precision and 55% recall. Details and caveats under [Accuracy and F1](#accuracy-and-f1).
 - What matters most: lead time, special requests, travel agent and market segment.
 
 ![Test result](figures/resultado_teste.png)
 
 The result is given as a range (67% to 73%) because of one variable with a caveat, explained under [Limitations](#limitations).
+
+## Accuracy and F1
+
+To measure hits, the probability is turned into a yes or no with a threshold and the prediction is compared with what happened. On test:
+
+| | Accuracy | Precision | Recall | F1 |
+|---|---|---|---|---|
+| Guess that no booking cancels | 65.3% | – | 0% | 0 |
+| Guess that every booking cancels | 34.7% | 34.7% | 100% | 0.52 |
+| LightGBM, default threshold 0.5 | 72.7% | 67.9% | 40.2% | 0.51 |
+| **LightGBM, profit threshold 0.31 (official)** | **72.5%** | **61.8%** | **54.5%** | **0.58** |
+| LightGBM, best-F1 threshold 0.26 | 71.4% | 58.2% | 62.8% | 0.60 |
+
+- **Accuracy alone is misleading.** 72.5% looks high, but guessing that nobody cancels already gets 65.3% right, because most bookings are not canceled. The real gain in accuracy is about 7 points.
+- **Precision and recall say more:** of the bookings the model flags as risky, 62% cancel; of the cancellations that happened, it catches 55%.
+- **The default 0.5 threshold is a poor choice here:** it catches only 40% of cancellations, and its F1 falls below the guess that every booking cancels. Each metric points to a different threshold; the official one was chosen by profit (see [Decision](#decision-who-to-call)), and all thresholds were chosen on validation.
+
+![Confusion matrix on test](figures/matriz_confusao.png)
 
 *Charts and notebooks are in Portuguese.*
 
@@ -100,7 +119,7 @@ Download `hotel_bookings.csv` from [Kaggle](https://www.kaggle.com/datasets/jess
 | `notebooks/01_dados_eda.ipynb` | Cleaning, duplicates, leakage audit and exploratory analysis. Saves the clean dataset |
 | `notebooks/02_separacao.ipynb` | Splits training, validation and test by date |
 | `notebooks/03_modelos.ipynb` | Baselines, models and model choice. Measures how much leakage would inflate the result |
-| `notebooks/04_decisao_e_teste.ipynb` | Cost-based threshold, SHAP explanation and test result |
+| `notebooks/04_decisao_e_teste.ipynb` | Cost-based threshold, SHAP explanation, test result and accuracy metrics (accuracy, precision, recall, F1) |
 
 `notebooks/graficos.py` and `notebooks/avaliacao.py` hold the chart functions and metrics used by the notebooks.
 

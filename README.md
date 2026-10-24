@@ -10,11 +10,30 @@ No período de teste (chegadas de maio a agosto de 2017, que não foi usado para
 
 - Das 10% reservas que o modelo aponta como mais arriscadas, **67% a 73% cancelam de fato**. Escolhendo ao acaso seriam 35%, e com uma tabela simples de segmento × antecedência, 54%.
 - ROC-AUC de **0,765** (0,745 na versão conservadora).
+- Taxa de acerto (acurácia) de **72,5%**, com precisão de 62% e recall de 55%. Detalhes e ressalvas em [Taxa de acerto](#taxa-de-acerto).
 - O que mais pesa: antecedência da reserva, pedidos especiais, agência e segmento de mercado.
 
 ![Resultado no teste](figures/resultado_teste.png)
 
 O resultado é dado como intervalo (67% a 73%) por causa de uma variável com ressalva, explicada em [Limitações](#limitações).
+
+## Taxa de acerto
+
+Para medir acerto, a probabilidade vira sim ou não com um limiar e a previsão é comparada com o que aconteceu. No teste:
+
+| | Acurácia | Precisão | Recall | F1 |
+|---|---|---|---|---|
+| Chutar que nenhuma reserva cancela | 65,3% | – | 0% | 0 |
+| Chutar que todas cancelam | 34,7% | 34,7% | 100% | 0,52 |
+| LightGBM, limiar padrão 0,5 | 72,7% | 67,9% | 40,2% | 0,51 |
+| **LightGBM, limiar do lucro 0,31 (oficial)** | **72,5%** | **61,8%** | **54,5%** | **0,58** |
+| LightGBM, limiar de maior F1 0,26 | 71,4% | 58,2% | 62,8% | 0,60 |
+
+- **A acurácia engana sozinha.** 72,5% parece alto, mas chutar que ninguém cancela já acerta 65,3%, porque a maioria das reservas não cancela. O ganho real em acurácia é de uns 7 pontos.
+- **Precisão e recall dizem mais:** das reservas que o modelo marca como risco, 62% cancelam; dos cancelamentos que aconteceram, ele pega 55%.
+- **O limiar padrão 0,5 é uma escolha ruim aqui:** pega só 40% dos cancelamentos, e o F1 fica abaixo do chute de que todas cancelam. Cada métrica aponta para um limiar diferente; o oficial foi escolhido pelo lucro (ver [Decisão](#decisão-para-quem-ligar)), e todos os limiares foram escolhidos na validação.
+
+![Matriz de confusão no teste](figures/matriz_confusao.png)
 
 ## Dados
 
@@ -98,7 +117,7 @@ Baixe `hotel_bookings.csv` do [Kaggle](https://www.kaggle.com/datasets/jessemost
 | `notebooks/01_dados_eda.ipynb` | Limpeza, duplicadas, auditoria de vazamento e análise exploratória. Salva a base limpa |
 | `notebooks/02_separacao.ipynb` | Separa treino, validação e teste por data |
 | `notebooks/03_modelos.ipynb` | Pontos de comparação, modelos e escolha. Mede quanto o vazamento inflaria o resultado |
-| `notebooks/04_decisao_e_teste.ipynb` | Limiar pelo custo, explicação com SHAP e resultado no teste |
+| `notebooks/04_decisao_e_teste.ipynb` | Limiar pelo custo, explicação com SHAP, resultado no teste e taxa de acerto (acurácia, precisão, recall, F1) |
 
 `notebooks/graficos.py` e `notebooks/avaliacao.py` têm as funções de gráfico e as métricas usadas pelos notebooks.
 
