@@ -5,6 +5,7 @@ import matplotlib.ticker as mtick
 import numpy as np
 
 AZUL, LARANJA = "#2a78d6", "#eb6834"
+CORES = [AZUL, LARANJA, "#1baf7a", "#eda100"]  # ordem fixa para gráficos com várias séries
 TEXTO, TEXTO_SECUNDARIO, GRADE = "#0b0b0b", "#52514e", "#e4e3df"
 FUNDO_ROTULO = dict(facecolor="white", edgecolor="none", pad=1)  # rótulo legível quando cruza a linha da média
 
@@ -77,6 +78,28 @@ def barras_com_sinal(ax, valores, titulo):
     ax.set_xlim(menor - folga, maior + folga)
     ax.grid(axis="x")
     ax.grid(axis="y", visible=False)
+    ax.set_title(titulo)
+
+
+def matriz_confusao(ax, matriz, titulo):
+    """Matriz 2×2 — linhas: o que aconteceu; colunas: o que o modelo disse — com contagem e % do total."""
+    from matplotlib.colors import LinearSegmentedColormap
+
+    azuis = LinearSegmentedColormap.from_list("azuis", ["#cde2fb", "#184f95"])
+    ax.imshow(matriz, cmap=azuis, vmin=0)
+    nomes = [["acerto", "alarme falso"], ["não pegou", "acerto"]]
+    total = matriz.sum()
+    for (i, j), n in np.ndenumerate(matriz):
+        contagem = f"{n:,}".replace(",", ".")
+        ax.text(j, i, f"{nomes[i][j]}\n{contagem}\n{pct(n / total)}",
+                ha="center", va="center", color="white" if n > matriz.max() * 0.55 else TEXTO)
+    ax.set_xticks([0, 1], ["não cancela", "cancela"])
+    ax.set_yticks([0, 1], ["não cancelou", "cancelou"])
+    ax.set_xlabel("o modelo disse")
+    ax.set_ylabel("o que aconteceu")
+    ax.grid(False)
+    for lado in ax.spines.values():
+        lado.set_visible(False)
     ax.set_title(titulo)
 
 

@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score, roc_auc_score
 
 FAIXAS_ANTECEDENCIA = [-1, 7, 30, 90, 180, 365, np.inf]
 
@@ -23,6 +23,16 @@ def metricas(y, prob):
         "ROC-AUC": roc_auc_score(y, prob),
         "PR-AUC": average_precision_score(y, prob),
         "cancelam no top 10%": taxa_no_topo(y, prob),
+    }
+
+
+def metricas_de_acerto(y, previsto):
+    """Acurácia, precisão, recall e F1 de uma previsão sim/não (`previsto` True = vai cancelar)."""
+    return {
+        "acurácia": accuracy_score(y, previsto),
+        "precisão": precision_score(y, previsto, zero_division=0),
+        "recall": recall_score(y, previsto),
+        "F1": f1_score(y, previsto, zero_division=0),
     }
 
 
